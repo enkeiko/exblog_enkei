@@ -1,16 +1,15 @@
-# Git 인증 설정 가이드
+# Git 인증 설정 가이드 (Windows)
 
-이 가이드는 `git.nnotion.kr` Gitea 서버에서 Personal Access Token(PAT)을 발급받고, Windows/Mac에서 설정하는 방법을 안내합니다.
+이 가이드는 `git.nnotion.kr` Gitea 서버에서 Personal Access Token(PAT)을 발급받고, Windows에서 설정하는 방법을 안내합니다.
 
 ---
 
 ## 목차
 
 1. [Personal Access Token 발급](#1-personal-access-token-발급)
-2. [Windows 설정](#2-windows-설정)
-3. [Mac 설정](#3-mac-설정)
-4. [설정 확인](#4-설정-확인)
-5. [문제 해결](#5-문제-해결)
+2. [인증 설정](#2-인증-설정)
+3. [설정 확인](#3-설정-확인)
+4. [문제 해결](#4-문제-해결)
 
 ---
 
@@ -46,7 +45,7 @@ https://git.nnotion.kr/user/settings/applications
 
 ---
 
-## 2. Windows 설정
+## 2. 인증 설정
 
 ### 방법 A: Git Bash 사용 (권장)
 
@@ -67,7 +66,7 @@ echo "https://사용자명:토큰@git.nnotion.kr" >> ~/.git-credentials
 **예시** (사용자명: `jobdori`, 토큰: `abc123...`):
 
 ```bash
-echo "https://jobdori:d262946c36480d23f57736dfe76b845706f513b0@git.nnotion.kr" >> ~/.git-credentials
+echo "https://jobdori:abc123token@git.nnotion.kr" >> ~/.git-credentials
 ```
 
 ### 방법 B: Windows Credential Manager 사용
@@ -87,71 +86,27 @@ echo "https://jobdori:d262946c36480d23f57736dfe76b845706f513b0@git.nnotion.kr" >
    - **암호**: `발급받은 토큰`
 3. `확인` 클릭
 
-### 방법 C: 프로젝트 폴더에서 직접 설정
+### 방법 C: PowerShell 사용
 
-```bash
-# 프로젝트 폴더로 이동
-cd 프로젝트경로
+#### 2.1 PowerShell 열기
 
-# 원격 URL에 인증정보 포함
-git remote set-url origin https://사용자명:토큰@git.nnotion.kr/Clauders/Ex1-my-blog.git
-```
+- 시작 메뉴 → `PowerShell` 검색 → 실행
 
----
+#### 2.2 인증 설정
 
-## 3. Mac 설정
-
-### 방법 A: 터미널 사용 (권장)
-
-#### 3.1 터미널 열기
-
-- `Cmd + Space` → `터미널` 검색 → 실행
-
-#### 3.2 호스트별 인증 설정
-
-```bash
-# git.nnotion.kr 전용 credential 설정
+```powershell
+# credential helper 설정
 git config --global credential.https://git.nnotion.kr.helper store
 
 # 인증정보 저장
-echo "https://사용자명:토큰@git.nnotion.kr" >> ~/.git-credentials
+Add-Content -Path "$env:USERPROFILE\.git-credentials" -Value "https://사용자명:토큰@git.nnotion.kr"
 ```
 
-**예시** (사용자명: `jobdori`, 토큰: `abc123...`):
-
-```bash
-echo "https://jobdori:d262946c36480d23f57736dfe76b845706f513b0@git.nnotion.kr" >> ~/.git-credentials
-```
-
-### 방법 B: macOS Keychain 사용
-
-#### 3.1 Keychain 설정
-
-```bash
-# Keychain helper 설정
-git config --global credential.helper osxkeychain
-```
-
-#### 3.2 첫 Push 시 인증
-
-```bash
-git push -u origin main
-```
-
-프롬프트가 나타나면:
-
-```
-Username: 사용자명
-Password: 토큰 (비밀번호 아님!)
-```
-
-> Keychain에 자동 저장되어 이후 입력 불필요
-
-### 방법 C: 프로젝트 폴더에서 직접 설정
+### 방법 D: 프로젝트 폴더에서 직접 설정
 
 ```bash
 # 프로젝트 폴더로 이동
-cd ~/Desktop/my-blog
+cd C:\Users\사용자명\Desktop\my-blog
 
 # 원격 URL에 인증정보 포함
 git remote set-url origin https://사용자명:토큰@git.nnotion.kr/Clauders/Ex1-my-blog.git
@@ -159,9 +114,9 @@ git remote set-url origin https://사용자명:토큰@git.nnotion.kr/Clauders/Ex
 
 ---
 
-## 4. 설정 확인
+## 3. 설정 확인
 
-### 4.1 원격 저장소 확인
+### 3.1 원격 저장소 확인
 
 ```bash
 git remote -v
@@ -174,7 +129,7 @@ origin  https://git.nnotion.kr/Clauders/Ex1-my-blog.git (fetch)
 origin  https://git.nnotion.kr/Clauders/Ex1-my-blog.git (push)
 ```
 
-### 4.2 Push 테스트
+### 3.2 Push 테스트
 
 ```bash
 git push
@@ -193,16 +148,35 @@ To https://git.nnotion.kr/Clauders/Ex1-my-blog.git
    abc1234..def5678  main -> main
 ```
 
-### 4.3 Credential 설정 확인
+### 3.3 Credential 설정 확인
+
+**Git Bash:**
 
 ```bash
-# 저장된 credential 확인
 cat ~/.git-credentials
 ```
 
+**PowerShell:**
+
+```powershell
+Get-Content "$env:USERPROFILE\.git-credentials"
+```
+
+**파일 위치:**
+
+```
+C:\Users\사용자명\.git-credentials
+```
+
+### 3.4 Credential Manager 확인
+
+1. `Win + R` → `control` → `사용자 계정` → `자격 증명 관리자`
+2. `Windows 자격 증명` 탭
+3. `git:https://git.nnotion.kr` 항목 확인
+
 ---
 
-## 5. 문제 해결
+## 4. 문제 해결
 
 ### 문제: `Authentication failed`
 
@@ -213,11 +187,18 @@ cat ~/.git-credentials
 ```bash
 # 기존 credential 삭제
 git config --global --unset credential.helper
+```
 
-# Windows: Credential Manager에서 해당 항목 삭제
-# Mac: Keychain Access에서 git.nnotion.kr 항목 삭제
+그리고 Credential Manager에서 삭제:
 
-# 다시 설정
+1. `Win + R` → `control` → `사용자 계정` → `자격 증명 관리자`
+2. `Windows 자격 증명` 탭
+3. `git:https://git.nnotion.kr` 항목 찾기
+4. `제거` 클릭
+
+다시 설정:
+
+```bash
 git config --global credential.https://git.nnotion.kr.helper store
 ```
 
@@ -232,7 +213,7 @@ git config --global credential.https://git.nnotion.kr.helper store
 git config --global credential.https://git.nnotion.kr.helper store
 
 # github.com 전용 (필요시)
-git config --global credential.https://github.com.helper store
+git config --global credential.https://github.com.helper manager
 ```
 
 ### 문제: `remote: Repository not found`
@@ -252,11 +233,21 @@ git config --global credential.https://github.com.helper store
 1. https://git.nnotion.kr/user/settings/applications 접속
 2. 기존 토큰 삭제 (Revoke)
 3. 새 토큰 생성
-4. `~/.git-credentials` 파일 수정 또는 재설정
+4. `.git-credentials` 파일 수정 또는 재설정
+
+### 문제: Git Bash가 설치되어 있지 않음
+
+**해결**: Git for Windows 설치
+
+1. https://git-scm.com/download/win 접속
+2. 다운로드 및 설치
+3. 설치 시 "Git Bash Here" 옵션 체크
 
 ---
 
 ## 부록: 유용한 명령어
+
+**Git Bash:**
 
 ```bash
 # Git 설정 전체 확인
@@ -266,8 +257,7 @@ git config --list
 git config --global credential.helper
 
 # credential 파일 위치
-# Windows: C:\Users\사용자명\.git-credentials
-# Mac: ~/.git-credentials
+# C:\Users\사용자명\.git-credentials
 
 # 원격 URL 변경
 git remote set-url origin [새URL]
@@ -279,17 +269,30 @@ git branch
 git push -u origin main
 ```
 
+**PowerShell:**
+
+```powershell
+# Git 설정 확인
+git config --list
+
+# credential 파일 확인
+Get-Content "$env:USERPROFILE\.git-credentials"
+
+# credential 파일 열기 (메모장)
+notepad "$env:USERPROFILE\.git-credentials"
+```
+
 ---
 
 ## 요약
 
-| 단계 | Windows | Mac |
-|------|---------|-----|
-| 1. 토큰 발급 | Gitea 웹에서 생성 | 동일 |
-| 2. 터미널 열기 | Git Bash | 터미널 |
-| 3. Credential 설정 | `credential.helper store` | 동일 또는 `osxkeychain` |
-| 4. 인증정보 저장 | `~/.git-credentials` | 동일 |
-| 5. Push 테스트 | `git push` | 동일 |
+| 단계 | 명령어/작업 |
+|------|-------------|
+| 1. 토큰 발급 | Gitea 웹에서 생성 |
+| 2. Git Bash 열기 | 시작 메뉴 → Git Bash |
+| 3. Credential 설정 | `git config --global credential.https://git.nnotion.kr.helper store` |
+| 4. 인증정보 저장 | `echo "https://user:token@git.nnotion.kr" >> ~/.git-credentials` |
+| 5. Push 테스트 | `git push` |
 
 ---
 
