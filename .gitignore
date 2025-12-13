@@ -1,0 +1,12 @@
+# Environment variables
+.env
+
+# Playwright
+.playwright-mcp/
+
+# OS files
+.DS_Store
+
+# Temporary files
+/tmp/
+*.tmp
