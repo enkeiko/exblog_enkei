@@ -48,6 +48,9 @@ jobs:
 
           echo "filename=${FILES[$NEXT]}" >> $GITHUB_OUTPUT
 
+      - name: Install xvfb
+        run: sudo apt-get install -y xvfb
+
       - name: Publish to Naver Blog
         if: steps.episode.outputs.next <= 10
         env:
@@ -56,7 +59,7 @@ jobs:
           NAVER_BLOG_URL: ${{ secrets.NAVER_BLOG_URL }}
         run: |
           FILE=${{ steps.episode.outputs.filename }}
-          node publish.js "posts/special-small-business-marketing/${FILE}.md" "posts/special-small-business-marketing/images/${FILE}.jpg"
+          xvfb-run --auto-servernum node publish.js "posts/special-small-business-marketing/${FILE}.md" "posts/special-small-business-marketing/images/${FILE}.jpg"
 
       - name: Update status
         if: steps.episode.outputs.next <= 10
