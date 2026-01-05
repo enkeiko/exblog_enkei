@@ -1,0 +1,70 @@
+name: Auto Publish Blog
+
+on:
+  schedule:
+    # 매일 오전 9시 (KST) = 0시 (UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install playwright dotenv
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Get next episode
+        id: episode
+        run: |
+          LAST=$(cat posts/special-small-business-marketing/publish-status.json | jq '.lastPublished')
+          NEXT=$((LAST + 1))
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+          echo "Next episode: $NEXT"
+
+      - name: Publish to Naver Blog
+        if: steps.episode.outputs.next <= 10
+        env:
+          NAVER_LOGIN_ID: ${{ secrets.NAVER_LOGIN_ID }}
+          NAVER_LOGIN_PASSWORD: ${{ secrets.NAVER_LOGIN_PASSWORD }}
+          NAVER_BLOG_URL: ${{ secrets.NAVER_BLOG_URL }}
+        run: |
+          EP=${{ steps.episode.outputs.next }}
+          EP_PADDED=$(printf "%02d" $EP)
+          node publish.js "posts/special-small-business-marketing/ep${EP_PADDED}-*.md" "posts/special-small-business-marketing/images/ep${EP_PADDED}-*.jpg"
+
+      - name: Update status
+        if: steps.episode.outputs.next <= 10
+        run: |
+          EP=${{ steps.episode.outputs.next }}
+          cat posts/special-small-business-marketing/publish-status.json | jq ".lastPublished = $EP" > tmp.json
+          mv tmp.json posts/special-small-business-marketing/publish-status.json
+
+      - name: Commit status update
+        if: steps.episode.outputs.next <= 10
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add posts/special-small-business-marketing/publish-status.json
+          git commit -m "Update publish status: Episode ${{ steps.episode.outputs.next }}" || true
+          git push
+
+      - name: Send Telegram notification
+        if: always()
+        run: |
+          EP=${{ steps.episode.outputs.next }}
+          STATUS="${{ job.status }}"
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "text=[GitHub Actions] Episode $EP - $STATUS"

@@ -3,6 +3,7 @@
 
 # Playwright
 .playwright-mcp/
+.browser-data/
 
 # OS files
 .DS_Store
@@ -10,3 +11,13 @@
 # Temporary files
 /tmp/
 *.tmp
+
+# Node
+node_modules/
+
+# Debug files
+debug-*.png
+error-*.png
+
+# Config with secrets
+posts/special-small-business-marketing/config.json
