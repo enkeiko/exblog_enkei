@@ -33,6 +33,21 @@ jobs:
           echo "next=$NEXT" >> $GITHUB_OUTPUT
           echo "Next episode: $NEXT"
 
+          # 에피소드별 파일명 매핑
+          declare -A FILES
+          FILES[1]="ep01-intro"
+          FILES[2]="ep02-tools"
+          FILES[3]="ep03-instagram"
+          FILES[4]="ep04-blog"
+          FILES[5]="ep05-review"
+          FILES[6]="ep06-ads"
+          FILES[7]="ep07-menu"
+          FILES[8]="ep08-ideas"
+          FILES[9]="ep09-image"
+          FILES[10]="ep10-tips"
+
+          echo "filename=${FILES[$NEXT]}" >> $GITHUB_OUTPUT
+
       - name: Publish to Naver Blog
         if: steps.episode.outputs.next <= 10
         env:
@@ -40,9 +55,8 @@ jobs:
           NAVER_LOGIN_PASSWORD: ${{ secrets.NAVER_LOGIN_PASSWORD }}
           NAVER_BLOG_URL: ${{ secrets.NAVER_BLOG_URL }}
         run: |
-          EP=${{ steps.episode.outputs.next }}
-          EP_PADDED=$(printf "%02d" $EP)
-          node publish.js "posts/special-small-business-marketing/ep${EP_PADDED}-*.md" "posts/special-small-business-marketing/images/ep${EP_PADDED}-*.jpg"
+          FILE=${{ steps.episode.outputs.filename }}
+          node publish.js "posts/special-small-business-marketing/${FILE}.md" "posts/special-small-business-marketing/images/${FILE}.jpg"
 
       - name: Update status
         if: steps.episode.outputs.next <= 10
