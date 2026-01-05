@@ -1,9 +1,14 @@
 {
-  "lastPublished": 1,
+  "lastPublished": 2,
   "history": [
     {
       "episode": 1,
       "date": "2026-01-05T00:00:00.000Z",
+      "success": true
+    },
+    {
+      "episode": 2,
+      "date": "2026-01-06T00:00:00.000Z",
       "success": true
     }
   ]
